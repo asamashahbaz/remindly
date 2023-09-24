@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 @Fts4
 @Entity(tableName = "reminders")
 data class ReminderEntity(
-	@PrimaryKey @ColumnInfo(name = "rowid") val id: Int,
+	@PrimaryKey(autoGenerate = true) @ColumnInfo(name = "rowid") val id: Int,
 	val title: String,
 	val dateISO: String,
 )
