@@ -1,4 +1,4 @@
-package com.asama.remindly.ui.theme
+package com.asama.remindly.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

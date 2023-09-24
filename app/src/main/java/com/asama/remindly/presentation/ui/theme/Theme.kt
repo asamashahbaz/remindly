@@ -1,4 +1,4 @@
-package com.asama.remindly.ui.theme
+package com.asama.remindly.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build
