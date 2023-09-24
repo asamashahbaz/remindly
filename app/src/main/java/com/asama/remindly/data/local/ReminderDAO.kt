@@ -16,13 +16,13 @@ interface ReminderDAO {
 	suspend fun getById(id: Int): ReminderEntity?
 
 	@Query("SELECT * FROM reminders WHERE title LIKE :title")
-	fun getByTitle(title: String): Flow<List<ReminderEntity?>>
+	fun getByTitle(title: String): Flow<List<ReminderEntity>>
 
 	@Query("SELECT * FROM reminders WHERE dateISO = :dateISO")
-	fun getByDateISO(dateISO: String): Flow<List<ReminderEntity?>>
+	fun getByDateISO(dateISO: String): Flow<List<ReminderEntity>>
 
 	@Query("SELECT * FROM reminders WHERE dateISO BETWEEN :dateISOStart AND :dateISOEnd")
-	fun getByDateISO(dateISOStart: String, dateISOEnd: String): Flow<List<ReminderEntity?>>
+	fun getByDateISO(dateISOStart: String, dateISOEnd: String): Flow<List<ReminderEntity>>
 
 	@Insert
 	suspend fun store(reminder: ReminderEntity)
