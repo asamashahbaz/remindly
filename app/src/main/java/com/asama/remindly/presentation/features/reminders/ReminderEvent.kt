@@ -6,4 +6,5 @@ sealed class ReminderEvent {
 		val reminderDate: Long
 	) : ReminderEvent()
 	data object NavigateToCreateReminder : ReminderEvent()
+	data object NavigateBack : ReminderEvent()
 }

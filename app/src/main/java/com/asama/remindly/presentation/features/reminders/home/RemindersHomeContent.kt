@@ -74,7 +74,7 @@ fun RemindersHomeContent(
 				containerColor = SecondaryDark,
 				contentColor = Color.White
 			),
-			contentPadding = PaddingValues(14.dp),
+			contentPadding = PaddingValues(horizontal = 14.dp, vertical = 18.dp),
 			shape = RoundedCornerShape(15.dp),
 		) {
 			Row(

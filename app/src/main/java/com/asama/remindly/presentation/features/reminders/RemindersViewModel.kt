@@ -89,6 +89,9 @@ class RemindersViewModel @Inject constructor(
 			is ReminderEvent.NavigateToCreateReminder -> viewModelScope.launch {
 				navigationChannel.send(NavigationIntent.NavigateTo(route = Destination.CreateReminderScreen.fullRoute, isSingleTop = true))
 			}
+			is ReminderEvent.NavigateBack -> viewModelScope.launch {
+				navigationChannel.send(NavigationIntent.NavigateBack())
+			}
 		}
 	}
 }
