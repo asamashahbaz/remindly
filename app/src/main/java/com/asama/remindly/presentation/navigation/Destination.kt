@@ -15,6 +15,7 @@ sealed class Destination(protected val route: String, vararg params: String) {
 
 	object RemindersListScreen : NoArgumentsDestination("reminders_list")
 
+	object CreateReminderScreen : NoArgumentsDestination("create_reminder")
 }
 
 internal fun String.appendParams(vararg params: Pair<String, Any?>): String {

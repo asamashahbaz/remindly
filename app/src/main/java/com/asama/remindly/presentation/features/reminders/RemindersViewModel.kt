@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.asama.remindly.common.Resource
 import com.asama.remindly.domain.usecase.ReminderUseCases
 import com.asama.remindly.presentation.navigation.AppNavigator
+import com.asama.remindly.presentation.navigation.Destination
+import com.asama.remindly.presentation.navigation.NavigationIntent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -83,6 +85,9 @@ class RemindersViewModel @Inject constructor(
 						}
 					}
 				}
+			}
+			is ReminderEvent.NavigateToCreateReminder -> viewModelScope.launch {
+				navigationChannel.send(NavigationIntent.NavigateTo(route = Destination.CreateReminderScreen.fullRoute, isSingleTop = true))
 			}
 		}
 	}

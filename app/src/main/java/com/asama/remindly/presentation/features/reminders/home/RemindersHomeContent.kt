@@ -238,7 +238,7 @@ private fun CreateNewReminderButton(event: (ReminderEvent) -> Unit) {
 		),
 		contentPadding = PaddingValues(0.dp),
 		shape = CircleShape,
-		onClick = { /*TODO*/ }
+		onClick = { event(ReminderEvent.NavigateToCreateReminder) }
 	) {
 		Image(
 			imageVector = Icons.Default.Add,
