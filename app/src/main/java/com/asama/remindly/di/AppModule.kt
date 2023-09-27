@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.asama.remindly.data.local.ReminderDAO
 import com.asama.remindly.data.local.RemindersDatabase
+import com.asama.remindly.data.repository.RemindersRepositoryImpl
+import com.asama.remindly.domain.repository.RemindersRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,16 +19,22 @@ object AppModule {
 
 	@Provides
 	@Singleton
-	fun providesRemindersDatabase(@ApplicationContext applicationContext: Context): RemindersDatabase {
+	fun provideRemindersDatabase(@ApplicationContext applicationContext: Context): RemindersDatabase {
 		return Room.databaseBuilder(
 			applicationContext,
 			RemindersDatabase::class.java, "reminders_database"
-		).build()
+		).fallbackToDestructiveMigration().build()
 	}
 
 	@Provides
-	fun providesReminderDAO(database: RemindersDatabase): ReminderDAO {
+	fun provideReminderDAO(database: RemindersDatabase): ReminderDAO {
 		return database.reminderDao()
+	}
+
+	@Provides
+	@Singleton
+	fun provideRepository(reminderDAO: ReminderDAO): RemindersRepository {
+		return RemindersRepositoryImpl(reminderDAO)
 	}
 
 }
