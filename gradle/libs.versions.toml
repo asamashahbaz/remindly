@@ -11,7 +11,7 @@ activity-compose = "1.7.2"
 compose-bom = "2023.09.01"
 
 # Compose Navigation
-androidx-navigation-compose = "2.7.2"
+androidx-navigation-compose = "2.7.3"
 
 # Room Database
 androidx-room = "2.6.0-rc01"
@@ -21,6 +21,9 @@ ksp = "1.9.10-1.0.13"
 
 # Dagger Hilt
 dagger-hilt = "2.48"
+
+# Material Icons
+androidx-material-icons-extended = "1.6.0-alpha06"
 
 [libraries]
 # Defaults
@@ -50,6 +53,9 @@ androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = 
 # Dagger Hilt
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "dagger-hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "dagger-hilt" }
+
+# Material Icons
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "androidx-material-icons-extended" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }

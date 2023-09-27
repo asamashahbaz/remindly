@@ -82,4 +82,8 @@ dependencies {
 	// Dagger Hilt
 	implementation(libs.hilt.android)
 	ksp(libs.hilt.compiler)
+
+	// Material Icons
+	implementation(libs.androidx.material.icons.extended)
+
 }

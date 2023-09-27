@@ -4,14 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.asama.remindly.common.Resource
 import com.asama.remindly.domain.usecase.ReminderUseCases
-import com.asama.remindly.presentation.features.reminders.ReminderEvent
-import com.asama.remindly.presentation.features.reminders.UiState
 import com.asama.remindly.presentation.navigation.AppNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,11 +37,23 @@ class RemindersViewModel @Inject constructor(
 			getReminders.getAll().collectLatest { response ->
 				when (response) {
 					is Resource.Success -> {
-						_uiState.value = UiState(reminders = response.data)
+						val completedCount = response.data.filter { it.completed }.size
+						println("getAllReminders: $completedCount")
+						_uiState.update {
+							UiState(
+								reminders = response.data,
+							)
+						}
+						launch {
+							delay(2000)
+							println("getAllReminders - AFTER: ${_uiState.value.completedCount}")
+						}
 					}
+
 					is Resource.Error -> {
 						_uiState.value = UiState(error = response.message)
 					}
+
 					else -> {
 						_uiState.value = UiState(isLoading = true)
 					}
@@ -60,9 +72,11 @@ class RemindersViewModel @Inject constructor(
 							is Resource.Success -> {
 								_uiState.value = UiState(reminders = response.data)
 							}
+
 							is Resource.Error -> {
 								_uiState.value = UiState(error = response.message)
 							}
+
 							else -> {
 								_uiState.value = UiState(isLoading = true)
 							}

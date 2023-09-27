@@ -8,4 +8,6 @@ data class UiState(
 	val currentDate: Calendar = Calendar.getInstance(),
 	val isLoading: Boolean = false,
 	val error: String = ""
-)
+) {
+	val completedCount = reminders.filter { it.completed }.size
+}
