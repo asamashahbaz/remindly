@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -220,7 +221,13 @@ private fun ReminderDateAndTime(
 				modifier = Modifier
 					.fillMaxWidth()
 					.padding(16.dp),
-				state = timePickerState
+				state = timePickerState,
+				colors = TimePickerDefaults.colors(
+					timeSelectorSelectedContainerColor = Teal,
+					timeSelectorSelectedContentColor = Color.Black,
+					selectorColor = Teal,
+					clockDialSelectedContentColor = Color.Black,
+				),
 			)
 		}
 	}
