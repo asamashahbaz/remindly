@@ -125,7 +125,9 @@ fun RemindersHomeContent(
 				Calendar.getInstance().apply {
 					timeInMillis = reminder.forTimestamp
 				}.get(Calendar.DATE) == uiState.currentDate.get(Calendar.DATE) && !reminder.completed
-			}.sortedByDescending { it.forTimestamp }.forEachIndexed { index, reminder ->
+			}.sortedBy {
+				it.forTimestamp
+			}.forEachIndexed { index, reminder ->
 				TodayReminderCard(index, reminder)
 			}
 		}

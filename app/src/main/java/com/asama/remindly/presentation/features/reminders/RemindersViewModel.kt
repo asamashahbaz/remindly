@@ -39,16 +39,10 @@ class RemindersViewModel @Inject constructor(
 			getReminders.getAll().collectLatest { response ->
 				when (response) {
 					is Resource.Success -> {
-						val completedCount = response.data.filter { it.completed }.size
-						println("getAllReminders: $completedCount")
 						_uiState.update {
 							UiState(
 								reminders = response.data,
 							)
-						}
-						launch {
-							delay(2000)
-							println("getAllReminders - AFTER: ${_uiState.value.completedCount}")
 						}
 					}
 
