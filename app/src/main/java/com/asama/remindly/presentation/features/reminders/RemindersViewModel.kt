@@ -67,28 +67,28 @@ class RemindersViewModel @Inject constructor(
 	fun onEvent(event: ReminderEvent) {
 		when (event) {
 			is ReminderEvent.CreateNewReminder -> {
+				if (event.reminderTitle.isEmpty()) {
+					return
+				}
 				viewModelScope.launch(Dispatchers.IO) {
-					createReminder(event.reminderTitle, event.reminderDate)
-					getReminders.getAll().collectLatest { response ->
-						when (response) {
-							is Resource.Success -> {
-								_uiState.value = UiState(reminders = response.data)
-							}
-
-							is Resource.Error -> {
-								_uiState.value = UiState(error = response.message)
-							}
-
-							else -> {
-								_uiState.value = UiState(isLoading = true)
-							}
-						}
-					}
+					createReminder(
+						event.reminderTitle,
+						event.reminderDescription,
+						event.reminderDate
+					)
+					navigationChannel.send(NavigationIntent.NavigateBack())
 				}
 			}
+
 			is ReminderEvent.NavigateToCreateReminder -> viewModelScope.launch {
-				navigationChannel.send(NavigationIntent.NavigateTo(route = Destination.CreateReminderScreen.fullRoute, isSingleTop = true))
+				navigationChannel.send(
+					NavigationIntent.NavigateTo(
+						route = Destination.CreateReminderScreen.fullRoute,
+						isSingleTop = true
+					)
+				)
 			}
+
 			is ReminderEvent.NavigateBack -> viewModelScope.launch {
 				navigationChannel.send(NavigationIntent.NavigateBack())
 			}

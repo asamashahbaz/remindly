@@ -9,10 +9,12 @@ class CreateReminderUseCase @Inject constructor(
 ) {
 	suspend operator fun invoke(
 		reminderTitle: String,
+		reminderDescription: String? = null,
 		reminderDate: Long
 	) {
 		val reminderEntity = ReminderEntity(
 			title = reminderTitle,
+			description = reminderDescription,
 			forTimestamp = reminderDate
 		)
 		repository.store(reminderEntity)

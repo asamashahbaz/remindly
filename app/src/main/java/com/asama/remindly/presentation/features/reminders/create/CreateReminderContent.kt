@@ -1,6 +1,7 @@
 package com.asama.remindly.presentation.features.reminders.create
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -21,22 +23,26 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerColors
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
@@ -55,8 +61,13 @@ fun CreateReminderContent(
 	event: (ReminderEvent) -> Unit
 ) {
 
-	val title by rememberSaveable { mutableStateOf("") }
-	val description by rememberSaveable { mutableStateOf("") }
+	val reminderDate by rememberSaveable {
+		mutableStateOf(Calendar.getInstance().apply {
+			timeInMillis = this.timeInMillis
+		})
+	}
+	var title by rememberSaveable { mutableStateOf("") }
+	var description by rememberSaveable { mutableStateOf("") }
 
 	Column(
 		modifier = Modifier
@@ -64,15 +75,30 @@ fun CreateReminderContent(
 			.padding(16.dp)
 	) {
 
-		HeaderArea(event = event)
+		HeaderArea(
+			event = event,
+			saveReminder = {
+				event(ReminderEvent.CreateNewReminder(
+					reminderTitle = title,
+					reminderDescription = description,
+					reminderDate = reminderDate.timeInMillis
+				))
+			}
+		)
 
-		ReminderDateAndTime(currentDate = uiState.currentDate)
+		ReminderDateAndTime(reminderDate = reminderDate)
 
+		ReminderTitleAndDescription(
+			title = title,
+			setTitle = { title = it },
+			description = description,
+			setDescription = { description = it }
+		)
 	}
 }
 
 @Composable
-private fun HeaderArea(event: (ReminderEvent) -> Unit) {
+private fun HeaderArea(event: (ReminderEvent) -> Unit, saveReminder: () -> Unit) {
 	Row(
 		modifier = Modifier.fillMaxWidth(),
 		horizontalArrangement = Arrangement.SpaceBetween,
@@ -112,7 +138,7 @@ private fun HeaderArea(event: (ReminderEvent) -> Unit) {
 			),
 			contentPadding = PaddingValues(0.dp),
 			shape = CircleShape,
-			onClick = { event(ReminderEvent.NavigateToCreateReminder) }
+			onClick = saveReminder
 		) {
 			Image(
 				imageVector = Icons.Default.Check,
@@ -124,21 +150,20 @@ private fun HeaderArea(event: (ReminderEvent) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ReminderDateAndTime(currentDate: Calendar) {
-	var reminderDate by rememberSaveable {
-		mutableLongStateOf(Calendar.getInstance().apply {
-			timeInMillis = currentDate.timeInMillis
-		}.timeInMillis)
-	}
-	val calendarDate by rememberSaveable(inputs = arrayOf(reminderDate)) {
-		mutableStateOf(Calendar.getInstance().apply {
-			timeInMillis = reminderDate
-		})
-	}
+private fun ReminderDateAndTime(
+	reminderDate: Calendar
+) {
 	var pickDate by rememberSaveable { mutableStateOf(false) }
 	val datePickerState = rememberDatePickerState(
-		initialSelectedDateMillis = reminderDate,
+		initialSelectedDateMillis = reminderDate.timeInMillis,
 		initialDisplayMode = DisplayMode.Picker
+	)
+
+	var pickTime by rememberSaveable { mutableStateOf(false) }
+	val timePickerState = rememberTimePickerState(
+		initialHour = reminderDate.get(Calendar.HOUR_OF_DAY),
+		initialMinute = reminderDate.get(Calendar.MINUTE),
+		is24Hour = true
 	)
 
 	if (pickDate) {
@@ -148,8 +173,8 @@ private fun ReminderDateAndTime(currentDate: Calendar) {
 			},
 			confirmButton = {
 				Button(onClick = {
-					println("Selected date: ${datePickerState.selectedDateMillis}")
-					reminderDate = datePickerState.selectedDateMillis ?: reminderDate
+					reminderDate.timeInMillis =
+						datePickerState.selectedDateMillis ?: reminderDate.timeInMillis
 					pickDate = false
 				}) {
 					Text(text = "Select")
@@ -169,6 +194,33 @@ private fun ReminderDateAndTime(currentDate: Calendar) {
 					todayContentColor = Color.White,
 					todayDateBorderColor = Color.White,
 				),
+			)
+		}
+	}
+
+	if (pickTime) {
+		DatePickerDialog(
+			onDismissRequest = {
+				pickTime = false
+			},
+			confirmButton = {
+				Button(onClick = {
+					val updatedTime = reminderDate.apply {
+						set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+						set(Calendar.MINUTE, timePickerState.minute)
+					}
+					reminderDate.timeInMillis = updatedTime.timeInMillis
+					pickTime = false
+				}) {
+					Text(text = "Select")
+				}
+			},
+		) {
+			TimePicker(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(16.dp),
+				state = timePickerState
 			)
 		}
 	}
@@ -195,13 +247,13 @@ private fun ReminderDateAndTime(currentDate: Calendar) {
 				contentDescription = null
 			)
 			Text(
-				text = (calendarDate.getDisplayName(
+				text = (reminderDate.getDisplayName(
 					Calendar.MONTH,
 					Calendar.LONG,
 					Locale.getDefault()
 				) ?: "").plus(
-					" ${calendarDate.get(Calendar.DATE)}, ${
-						calendarDate.get(
+					" ${reminderDate.get(Calendar.DATE)}, ${
+						reminderDate.get(
 							Calendar.YEAR
 						)
 					}"
@@ -223,7 +275,7 @@ private fun ReminderDateAndTime(currentDate: Calendar) {
 		modifier = Modifier
 			.fillMaxWidth()
 			.padding(top = 8.dp),
-		onClick = { /*TODO*/ },
+		onClick = { pickTime = true },
 		colors = ButtonDefaults.buttonColors(
 			containerColor = Teal,
 			contentColor = Color.Black
@@ -244,8 +296,8 @@ private fun ReminderDateAndTime(currentDate: Calendar) {
 				modifier = Modifier
 					.padding(start = 8.dp, end = 8.dp)
 					.weight(1f),
-				text = "All Reminders",
-				style = LocalTextStyle.current.copy(fontSize = 16.sp)
+				text = "${reminderDate.get(Calendar.HOUR_OF_DAY)}:${reminderDate.get(Calendar.MINUTE)}",
+				style = LocalTextStyle.current.copy(fontSize = 16.sp, color = Color.Black)
 			)
 			Image(
 				imageVector = Icons.Default.ArrowOutward,
@@ -253,5 +305,64 @@ private fun ReminderDateAndTime(currentDate: Calendar) {
 				contentDescription = "Button to select time for the reminder"
 			)
 		}
+	}
+}
+
+@Composable
+fun ReminderTitleAndDescription(
+	title: String,
+	setTitle: (String) -> Unit,
+	description: String,
+	setDescription: (String) -> Unit
+) {
+	Column(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(top = 16.dp)
+			.clip(RoundedCornerShape(15.dp))
+			.background(SecondaryDark),
+		verticalArrangement = Arrangement.spacedBy(0.dp)
+	) {
+		TextField(
+			modifier = Modifier.fillMaxWidth(),
+			value = title,
+			onValueChange = setTitle,
+			label = {
+				Text(text = "Title")
+			},
+			colors = TextFieldDefaults.colors(
+				disabledTextColor = Color.Transparent,
+				focusedIndicatorColor = Color.Transparent,
+				unfocusedIndicatorColor = Color.Transparent,
+				disabledIndicatorColor = Color.Transparent,
+				unfocusedContainerColor = Color.Transparent,
+				focusedContainerColor = Color.Transparent,
+				cursorColor = Color.White
+			),
+		)
+		Divider(
+			modifier = Modifier
+				.fillMaxWidth()
+				.height(1.dp),
+			color = Color.DarkGray
+		)
+		TextField(
+			modifier = Modifier.fillMaxWidth(),
+			value = description,
+			minLines = 4,
+			onValueChange = setDescription,
+			label = {
+				Text(text = "Description")
+			},
+			colors = TextFieldDefaults.colors(
+				disabledTextColor = Color.Transparent,
+				focusedIndicatorColor = Color.Transparent,
+				unfocusedIndicatorColor = Color.Transparent,
+				disabledIndicatorColor = Color.Transparent,
+				unfocusedContainerColor = Color.Transparent,
+				focusedContainerColor = Color.Transparent,
+				cursorColor = Color.White
+			)
+		)
 	}
 }

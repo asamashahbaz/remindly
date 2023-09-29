@@ -27,8 +27,6 @@ fun RemindersListContent(
 	uiState: UiState,
 	event: (ReminderEvent) -> Unit
 ) {
-	var title by rememberSaveable { mutableStateOf("") }
-	var date by rememberSaveable { mutableLongStateOf(Calendar.getInstance().timeInMillis) }
 
 	Column(
 		modifier = Modifier.fillMaxSize().imePadding(),
@@ -45,14 +43,6 @@ fun RemindersListContent(
 				}
 		}
 
-		Row {
-			TextField(value = title, onValueChange = { title = it })
-			Button(onClick = {
-				event(ReminderEvent.CreateNewReminder(title, date))
-			}) {
-				Text(text = "Create")
-			}
-		}
 	}
 
 }
